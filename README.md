@@ -12,9 +12,8 @@ Request :
 
 ```json 
 {
-    "id" : "string, unique",
     "name" : "string",
-    "price" : "long",
+    "price" : "string",
     "quantity" : "integer"
 }
 ```
@@ -26,12 +25,10 @@ Response :
     "code" : "number",
     "status" : "string",
     "data" : {
-         "id" : "string, unique",
+         "id" : "long, unique",
          "name" : "string",
-         "price" : "long",
+         "price" : "string",
          "quantity" : "integer",
-         "createdAt" : "date",
-         "updatedAt" : "date"
      }
 }
 ```
@@ -51,12 +48,10 @@ Response :
     "code" : "number",
     "status" : "string",
     "data" : {
-         "id" : "string, unique",
+         "id" : "long, unique",
          "name" : "string",
-         "price" : "long",
+         "price" : "string",
          "quantity" : "integer",
-         "createdAt" : "date",
-         "updatedAt" : "date"
      }
 }
 ```
@@ -74,7 +69,7 @@ Request :
 ```json 
 {
     "name" : "string",
-    "price" : "long",
+    "price" : "string",
     "quantity" : "integer"
 }
 ```
@@ -86,12 +81,10 @@ Response :
     "code" : "number",
     "status" : "string",
     "data" : {
-         "id" : "string, unique",
+         "id" : "long, unique",
          "name" : "string",
-         "price" : "long",
+         "price" : "string",
          "quantity" : "integer",
-         "createdAt" : "date",
-         "updatedAt" : "date"
      }
 }
 ```
@@ -115,20 +108,16 @@ Response :
     "status" : "string",
     "data" : [
         {
-             "id" : "string, unique",
+             "id" : "long, unique",
              "name" : "string",
-             "price" : "long",
+             "price" : "string",
              "quantity" : "integer",
-             "createdAt" : "date",
-             "updatedAt" : "date"
         },
         {
-             "id" : "string, unique",
+             "id" : "long, unique",
              "name" : "string",
-             "price" : "long",
+             "price" : "string",
              "quantity" : "integer",
-             "createdAt" : "date",
-             "updatedAt" : "date"
          }
     ]
 }
