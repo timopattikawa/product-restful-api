@@ -12,7 +12,7 @@ Request :
 
 ```json 
 {
-    "name" : "long",
+    "name" : "string",
     "price" : "string",
     "quantity" : "integer"
 }
@@ -25,7 +25,8 @@ Response :
     "code" : "number",
     "status" : "string",
     "data" : {
-         "name" : "long",
+         "id" : "long, unique",
+         "name" : "string",
          "price" : "string",
          "quantity" : "integer",
      }
@@ -68,7 +69,7 @@ Request :
 ```json 
 {
     "name" : "string",
-    "price" : "long",
+    "price" : "string",
     "quantity" : "integer"
 }
 ```
