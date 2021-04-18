@@ -6,6 +6,7 @@ import com.kamoro.product.api.model.ProductResponse;
 import com.kamoro.product.api.model.WebResponse;
 import com.kamoro.product.api.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,5 +50,22 @@ public class ProductController {
         return new WebResponse<>(200, "OK", productResponse);
     }
 
+    @PutMapping(
+            path = "/{productID}",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    public WebResponse<ProductResponse> updateProduct(
+            @PathVariable("productID") Long productID,
+            @RequestBody ProductRequest productRequest) {
+        ProductResponse productResponse = productService.updateProduct(productID, productRequest);
+        return new WebResponse<>(200, "OK", productResponse);
+    }
+
+    @DeleteMapping(path = "/{productID}")
+    public WebResponse<Object> deleteProduct(@PathVariable("productID") Long productID) {
+        productService.deleteProduct(productID);
+        return new WebResponse<>(200, "OK Deleted", null);
+    }
 
 }

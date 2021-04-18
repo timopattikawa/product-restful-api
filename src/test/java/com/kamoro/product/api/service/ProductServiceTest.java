@@ -13,9 +13,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,18 +39,19 @@ class ProductServiceTest {
                 10
         );
         Product product = new Product(
-                null,
+                1L,
                 "Susu Bearbrand",
                 "5000",
                 10
         );
 
-        underTestService.createNewProduct(productRequest);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
         ProductResponse productResponse = underTestService.createNewProduct(productRequest);
 
         assertThat(productResponse.getProductName()).isEqualTo(product.getProductName());
         assertThat(productResponse.getPrice()).isEqualTo(product.getPrice());
         assertThat(productResponse.getQuantity()).isEqualTo(product.getQuantity());
+        verify(productRepository).save(any(Product.class));
     }
 
     @Test
@@ -84,7 +87,7 @@ class ProductServiceTest {
         assertThatThrownBy(() -> underTestService.createNewProduct(productReq))
                 .isInstanceOf(ApiBadRequestException.class)
                 .hasMessageContaining("Product name cannot empty");
-        verify(productRepository, never()).save(productReq.productRequestToProduct());
+        verify(productRepository, never()).save(any(Product.class));
     }
 
     @Test
@@ -98,7 +101,7 @@ class ProductServiceTest {
         assertThatThrownBy(() -> underTestService.createNewProduct(product))
                 .isInstanceOf(ApiBadRequestException.class)
                 .hasMessageContaining("Product price cannot empty");
-        verify(productRepository, never()).save(product.productRequestToProduct());
+        verify(productRepository, never()).save(any(Product.class));
     }
 
     @Test
@@ -112,12 +115,32 @@ class ProductServiceTest {
         assertThatThrownBy(() -> underTestService.createNewProduct(product))
                 .isInstanceOf(ApiBadRequestException.class)
                 .hasMessageContaining("Product quantity cannot empty");
-        verify(productRepository, never()).save(product.productRequestToProduct());
+        verify(productRepository, never()).save(any(Product.class));
     }
 
     @Test
     void ItShouldSuccess_getAllProduct() {
         underTestService.getAllProduct();
+        verify(productRepository).findAll();
+    }
+
+    @Test
+    void ItShouldSuccess_getAllProduct_whenCopyToProductResponse() {
+        List<Product> products = List.of(
+                new Product(1L, "Susu Bearbrand", "5000", 1),
+                new Product(2L, "Susu Ultra Milk", "5000", 1)
+        );
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<ProductResponse> productResponses = underTestService.getAllProduct();
+
+        assertThat(productResponses.size()).isEqualTo(products.size());
+        for (int i = 0; i<productResponses.size(); i++) {
+            assertThat(productResponses.get(i).getProductId()).isEqualTo(products.get(i).getProductId());
+            assertThat(productResponses.get(i).getProductName()).isEqualTo(products.get(i).getProductName());
+            assertThat(productResponses.get(i).getPrice()).isEqualTo(products.get(i).getPrice());
+            assertThat(productResponses.get(i).getQuantity()).isEqualTo(products.get(i).getQuantity());
+        }
         verify(productRepository).findAll();
     }
 
@@ -151,5 +174,79 @@ class ProductServiceTest {
                 .isInstanceOf(ApiNotFoundException.class)
                 .hasMessageContaining("Not Found product with id: " + 1L);
         verify(productRepository).findById(1L);
+    }
+
+    @Test
+    public void ItShouldSuccess_updateProduct_All() {
+        Product product = new Product(
+                1L,
+                "Susu Bearbrand",
+                "5000",
+                10
+        );
+
+        ProductRequest productRequest =  new ProductRequest(
+                "Susu BearBrand",
+                "10000",
+                20
+        );
+
+        when(productRepository.findById(1L)).thenReturn(java.util.Optional.of(product));
+        underTestService.updateProduct(1L, productRequest);
+
+        verify(productRepository).findById(1L);
+        assertThat(product.getProductId()).isEqualTo(1L);
+        assertThat(product.getProductName()).isEqualTo(productRequest.getProductName());
+        assertThat(product.getPrice()).isEqualTo(productRequest.getPrice());
+        assertThat(product.getQuantity()).isEqualTo(productRequest.getQuantity());
+    }
+
+    @Test
+    public void ItShouldFail_updateProduct_CauseNotFoundProduct() {
+
+        ProductRequest productRequest =  new ProductRequest(
+                "Susu BearBrand",
+                "10000",
+                20
+        );
+
+        Long productID = 1L;
+
+        assertThatThrownBy(() -> underTestService.updateProduct(productID, productRequest))
+                .isInstanceOf(ApiNotFoundException.class)
+                .hasMessageContaining("Not Found product with id: " + productID);
+        verify(productRepository).findById(productID);
+    }
+
+    @Test
+    public void itShouldSuccess_deleteProduct() {
+        Long productID = 1L;
+        Product product = new Product(
+                1L,
+                "Susu Bearbrand",
+                "5000",
+                10
+        );
+        when(productRepository.findById(productID)).thenReturn(java.util.Optional.of(product));
+        underTestService.deleteProduct(productID);
+
+        verify(productRepository).findById(productID);
+        verify(productRepository).delete(product);
+    }
+
+    @Test
+    public void itShouldFail_deleteProduct_CauseNotFound() {
+        Long productID = 1L;
+        Product product = new Product(
+                1L,
+                "Susu Bearbrand",
+                "5000",
+                10
+        );
+        assertThatThrownBy(() -> underTestService.deleteProduct(productID))
+                .isInstanceOf(ApiNotFoundException.class)
+                .hasMessageContaining("Not found product with id: " + productID);
+        verify(productRepository).findById(productID);
+        verify(productRepository, never()).delete(product);
     }
 }

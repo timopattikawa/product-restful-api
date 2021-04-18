@@ -5,11 +5,11 @@ import com.kamoro.product.api.Exception.ApiNotFoundException;
 import com.kamoro.product.api.entity.Product;
 import com.kamoro.product.api.model.ProductRequest;
 import com.kamoro.product.api.model.ProductResponse;
-import com.kamoro.product.api.model.WebResponse;
 import com.kamoro.product.api.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,9 +43,9 @@ public class ProductService {
             throw new ApiBadRequestException("Product quantity cannot empty");
         }
 
-        Product save = productRepository.save(product.productRequestToProduct());
+        Product saveProduct = productRepository.save(new Product(null, product.getProductName(), product.getPrice(), product.getQuantity()));
 
-        return new ProductResponse(save.getProductId(), save.getProductName(), product.getPrice(), product.getQuantity());
+        return new ProductResponse(saveProduct.getProductId(), saveProduct.getProductName(), saveProduct.getPrice(), saveProduct.getQuantity());
     }
 
     public List<ProductResponse> getAllProduct() {
@@ -62,5 +62,40 @@ public class ProductService {
                 () -> new ApiNotFoundException("Not Found product with id: " + productID)
         );
         return new ProductResponse(product.getProductId(), product.getProductName(), product.getPrice(), product.getQuantity());
+    }
+
+    @Transactional
+    public ProductResponse updateProduct(Long productID, ProductRequest productRequest) {
+        Product product = productRepository.findById(productID).orElseThrow(
+                () -> new ApiNotFoundException("Not Found product with id: " + productID)
+        );
+
+        if((productRequest.getProductName() != null)
+                && product.getProductName() != productRequest.getProductName()) {
+            if(!productRequest.getProductName().isEmpty()) {
+                product.setProductName(productRequest.getProductName());
+            }
+        }
+
+        if((productRequest.getPrice() != null)
+                && product.getPrice() != productRequest.getPrice()) {
+            if (!productRequest.getPrice().isEmpty()) {
+                product.setPrice(productRequest.getPrice());
+            }
+        }
+
+        if((productRequest.getQuantity() != null)
+                && product.getQuantity() != productRequest.getQuantity()) {
+            product.setQuantity(productRequest.getQuantity());
+        }
+
+        return new ProductResponse(product.getProductId(), product.getProductName(), product.getPrice(), product.getQuantity());
+    }
+
+    public void deleteProduct(Long productID) {
+        Product product = productRepository.findById(productID).orElseThrow(
+                () -> new ApiNotFoundException("Not found product with id: " + productID)
+        );
+        productRepository.delete(product);
     }
 }

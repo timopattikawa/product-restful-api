@@ -16,10 +16,6 @@ public class ProductRequest {
         this.quantity = quantity;
     }
 
-    public Product productRequestToProduct() {
-        return new Product(null, this.productName, this.price, this.quantity);
-    }
-
     public String getProductName() {
         return productName;
     }

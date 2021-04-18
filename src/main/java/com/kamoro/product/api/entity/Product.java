@@ -2,6 +2,7 @@ package com.kamoro.product.api.entity;
 
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "products")
@@ -61,4 +62,15 @@ public class Product {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", productName='" + productName + '\'' +
+                ", price='" + price + '\'' +
+                ", quantity=" + quantity +
+                '}';
+    }
+
 }
