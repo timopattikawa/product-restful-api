@@ -4,7 +4,7 @@
 
 Request :
 - Method : POST
-- Endpoint : `/api/products`
+- Endpoint : `/api/v1/products`
 - Header :
   - Content-Type: application/json
   - Accept: application/json
